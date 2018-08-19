@@ -12,7 +12,7 @@ namespace EaDTextFiles
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Please select what you would like to do:\n1: Encrypt Text File\n2: Decrypt Text\n");
+            Console.WriteLine("Please select what you would like to do:\n1: Encrypt Text File\n2: Decrypt Text File\n");
             string UserChoice = Console.ReadLine();
             if(UserChoice == "1")
             {
@@ -41,7 +41,7 @@ namespace EaDTextFiles
                     {
                         if (File.Exists(FilePath))
                         {
-                            using (StreamReader sr = new StreamReader(FilePath + "Encrypted.txt"))
+                            using (StreamReader sr = new StreamReader(FilePath))
                             {
                                 string FileContent = sr.ReadToEnd();
                                 EncryptFileContent(FileContent, FilePath);
@@ -57,9 +57,44 @@ namespace EaDTextFiles
                         Console.WriteLine("No FilePath Entered.");
                     }
                 }
-            } else
+            } else if(UserChoice == "2")
             {
+                if (args.Length > 0)
+                {
+                    string FilePath = args[0];
 
+                    if(File.Exists(FilePath)) 
+                    {
+                        using (StreamReader sr = new StreamReader(FilePath))
+                        {
+                            string FileContent = sr.ReadToEnd();
+                            DecryptFileContent(FileContent, FilePath);
+                        }
+                    }
+                } else
+                {
+                    Console.WriteLine("Please enter the filepath of the text file: ");
+                    string FilePath = Console.ReadLine();
+                    if (FilePath.Length > 0)
+                    {
+                        if (File.Exists(FilePath))
+                        {
+                            using (StreamReader sr = new StreamReader(FilePath))
+                            {
+                                string FileContent = sr.ReadToEnd();
+                                DecryptFileContent(FileContent, FilePath);
+                            }
+                        } else
+                        {
+                            Console.WriteLine("File Not Found.");
+                        }
+                    } else 
+                    {
+                        Console.WriteLine("No FilePath Entered.");
+                    }
+                }
+            } else {
+                Console.WriteLine("That's is not a valid user choice.");
             }
             ExitProgram();
         }
@@ -70,10 +105,10 @@ namespace EaDTextFiles
             {
                 string EncryptedText = EncryptAndDecrypt.EncryptDecrypt.Encrypt(FileContent);
 
-                using(StreamWriter sw = new StreamWriter(FilePath))
+                using(StreamWriter sw = new StreamWriter(FilePath + "-Encrypted.txt"))
                 {
                     sw.WriteLine(EncryptedText);
-                    Console.WriteLine("Encrypted text added to FilePath");
+                    Console.WriteLine("Encrypted text written to: {0}-Encrypted.txt", FilePath);
                 }
             } else
             {
@@ -83,7 +118,23 @@ namespace EaDTextFiles
 
         static void DecryptFileContent(string FileContent, string FilePath)
         {
+            if(FileContent.Length > 0)
+            {
+                string DecryptedText = EncryptAndDecrypt.EncryptDecrypt.Decrypt(FileContent);
+                string FilePathDecrypted = FilePath.Remove(FilePath.Length-14);
+                string NewFilePath = string.Format("{0}-Decrypted.txt", FilePathDecrypted);
 
+                Console.WriteLine("New Path: {0}",NewFilePath);
+
+                using(StreamWriter sw = new StreamWriter(NewFilePath)) 
+                {
+                    sw.WriteLine(DecryptedText);
+                    Console.WriteLine("Decrypted text written to: {0}-Decrypted.txt", NewFilePath);
+                }
+            } else 
+            {
+                Console.WriteLine("No File Content");
+            }
         }
 
         static void ExitProgram()
